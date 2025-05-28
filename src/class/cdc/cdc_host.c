@@ -671,12 +671,7 @@ void cdch_close(uint8_t daddr) {
 }
 
 bool cdch_xfer_cb(uint8_t daddr, uint8_t ep_addr, xfer_result_t event, uint32_t xferred_bytes) {
-  if (!tuh_connected(daddr))
-  {
-	return false;
-  }
-
-	// TODO handle stall response, retry failed transfer ...
+  // TODO handle stall response, retry failed transfer ...
   TU_VERIFY(event == XFER_RESULT_SUCCESS);
 
   uint8_t const idx = get_idx_by_ep_addr(daddr, ep_addr);
