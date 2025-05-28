@@ -811,7 +811,10 @@ static void handle_rxflvl_irq(uint8_t rhport) {
       break;
 
     case GRXSTS_PKTSTS_HOST_DATATOGGLE_ERR:
-      TU_ASSERT(0, ); // maybe try to change DToggle
+      //TU_ASSERT(0, ); // maybe try to change DToggle
+      // Data toggle mismatch was already handled in the channel interrupt
+      // handler via HCINT_DATATOGGLE_ERR. Nothing else to do here other than
+      // discarding this FIFO entry.
       break;
 
     case GRXSTS_PKTSTS_HOST_CHANNEL_HALTED:
