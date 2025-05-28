@@ -671,12 +671,17 @@ void cdch_close(uint8_t daddr) {
 }
 
 bool cdch_xfer_cb(uint8_t daddr, uint8_t ep_addr, xfer_result_t event, uint32_t xferred_bytes) {
-  // TODO handle stall response, retry failed transfer ...
-  TU_ASSERT(event == XFER_RESULT_SUCCESS);
+  if (!tuh_connected(daddr))
+  {
+	return false;
+  }
+
+	// TODO handle stall response, retry failed transfer ...
+  TU_VERIFY(event == XFER_RESULT_SUCCESS);
 
   uint8_t const idx = get_idx_by_ep_addr(daddr, ep_addr);
   cdch_interface_t * p_cdc = get_itf(idx);
-  TU_ASSERT(p_cdc);
+  TU_VERIFY(p_cdc);
 
   if ( ep_addr == p_cdc->stream.tx.ep_addr ) {
     // invoke tx complete callback to possibly refill tx fifo
