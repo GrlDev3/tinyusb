@@ -948,7 +948,11 @@ static bool handle_channel_in_slave(dwc2_regs_t* dwc2, uint8_t ch_id, uint32_t h
     }
   } else if (hcint & HCINT_DATATOGGLE_ERR) {
     xfer->err_count = 0;
-    TU_ASSERT(false);
+    //TU_ASSERT(false);
+    channel->hcintmsk &= ~(HCINT_NAK | HCINT_DATATOGGLE_ERR);
+    hcsplt.split_compl = 0;
+    channel->hcsplt = hcsplt.value;
+    channel_xfer_in_retry(dwc2, ch_id, hcint);
   }
   return is_done;
 }
