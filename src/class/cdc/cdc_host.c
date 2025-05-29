@@ -703,7 +703,7 @@ bool cdch_xfer_cb(uint8_t daddr, uint8_t ep_addr, xfer_result_t event, uint32_t 
 
     // invoke receive callback
     if (tuh_cdc_rx_cb) {
-      tuh_cdc_rx_cb(idx);
+      tuh_cdc_rx_cb(idx, ep_addr, xferred_bytes);
     }
 
     // prepare for next transfer if needed

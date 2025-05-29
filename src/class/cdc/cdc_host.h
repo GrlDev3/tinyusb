@@ -183,7 +183,7 @@ TU_ATTR_WEAK extern void tuh_cdc_mount_cb(uint8_t idx);
 TU_ATTR_WEAK extern void tuh_cdc_umount_cb(uint8_t idx);
 
 // Invoked when received new data
-TU_ATTR_WEAK extern void tuh_cdc_rx_cb(uint8_t idx);
+TU_ATTR_WEAK extern void tuh_cdc_rx_cb(uint8_t idx, uint8_t ep_addr, uint32_t xferred_bytes);//(uint8_t idx);
 
 // Invoked when a TX is complete and therefore space becomes available in TX buffer
 TU_ATTR_WEAK extern void tuh_cdc_tx_complete_cb(uint8_t idx);
