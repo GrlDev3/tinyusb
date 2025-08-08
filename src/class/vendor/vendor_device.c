@@ -58,7 +58,7 @@ typedef struct {
 
 #define ITF_MEM_RESET_SIZE   (offsetof(vendord_interface_t, itf_num) + sizeof(((vendord_interface_t *)0)->itf_num))
 
-static vendord_interface_t _vendord_itf[CFG_TUD_VENDOR];
+static vendord_interface_t _vendord_itf[CFG_TUD_VENDOR]  __attribute__((section(".bigbuff_ram")));
 
 typedef struct {
   TUD_EPBUF_DEF(epout, CFG_TUD_VENDOR_EPSIZE);
