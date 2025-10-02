@@ -42,6 +42,17 @@
 #define TU_LOG_DRV(...)   TU_LOG(CFG_TUD_MSC_LOG_LEVEL, __VA_ARGS__)
 
 //--------------------------------------------------------------------+
+// Weak stubs: invoked if no strong implementation is available
+//--------------------------------------------------------------------+
+TU_ATTR_WEAK void tud_msc_inquiry_cb(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]) {
+  (void) lun; (void) vendor_id; (void) product_id; (void) product_rev;
+}
+TU_ATTR_WEAK uint32_t tud_msc_inquiry2_cb(uint8_t lun, scsi_inquiry_resp_t *inquiry_resp, uint32_t bufsize) {
+  (void) lun; (void) inquiry_resp; (void) bufsize;
+  return 0;
+}
+
+//--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF
 //--------------------------------------------------------------------+
 enum {
@@ -209,6 +220,53 @@ static bool proc_stage_status(mscd_interface_t *p_msc) {
     send_csw(p_msc);
   }
   #endif
+  return true;
+}
+
+//--------------------------------------------------------------------+
+// Weak stubs: invoked if no strong implementation is available
+//--------------------------------------------------------------------+
+TU_ATTR_WEAK void tud_msc_read10_complete_cb(uint8_t lun) {
+  (void) lun;
+}
+
+TU_ATTR_WEAK void tud_msc_write10_complete_cb(uint8_t lun) {
+  (void) lun;
+}
+
+TU_ATTR_WEAK void tud_msc_scsi_complete_cb(uint8_t lun, uint8_t const scsi_cmd[16]) {
+  (void) lun;
+  (void) scsi_cmd;
+}
+
+TU_ATTR_WEAK uint8_t tud_msc_get_maxlun_cb(void) {
+  return 1;
+}
+
+TU_ATTR_WEAK bool tud_msc_start_stop_cb(uint8_t lun, uint8_t power_condition, bool start, bool load_eject) {
+  (void) lun;
+  (void) power_condition;
+  (void) start;
+  (void) load_eject;
+  return true;
+}
+
+TU_ATTR_WEAK bool tud_msc_prevent_allow_medium_removal_cb(uint8_t lun, uint8_t prohibit_removal, uint8_t control) {
+  (void) lun;
+  (void) prohibit_removal;
+  (void) control;
+  return true;
+}
+
+TU_ATTR_WEAK int32_t tud_msc_request_sense_cb(uint8_t lun, void* buffer, uint16_t bufsize) {
+  (void) lun;
+  (void) buffer;
+  (void) bufsize;
+  return sizeof(scsi_sense_fixed_resp_t);
+}
+
+TU_ATTR_WEAK bool tud_msc_is_writable_cb(uint8_t lun) {
+  (void) lun;
   return true;
 }
 
@@ -392,10 +450,7 @@ bool mscd_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t 
       TU_LOG_DRV("  MSC Get Max Lun\r\n");
       TU_VERIFY(request->wValue == 0 && request->wLength == 1);
 
-      uint8_t maxlun = 1;
-      if (tud_msc_get_maxlun_cb) {
-        maxlun = tud_msc_get_maxlun_cb();
-      }
+      uint8_t maxlun = tud_msc_get_maxlun_cb();
       TU_VERIFY(maxlun);
       maxlun--; // MAX LUN is minus 1 by specs
       tud_control_xfer(rhport, request, &maxlun, 1);
@@ -573,21 +628,15 @@ bool mscd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t
         // if complete_cb() is invoked after queuing the status.
         switch (p_cbw->command[0]) {
           case SCSI_CMD_READ_10:
-            if (tud_msc_read10_complete_cb) {
-              tud_msc_read10_complete_cb(p_cbw->lun);
-            }
+            tud_msc_read10_complete_cb(p_cbw->lun);
             break;
 
           case SCSI_CMD_WRITE_10:
-            if (tud_msc_write10_complete_cb) {
-              tud_msc_write10_complete_cb(p_cbw->lun);
-            }
+            tud_msc_write10_complete_cb(p_cbw->lun);
             break;
 
           default:
-            if (tud_msc_scsi_complete_cb) {
-              tud_msc_scsi_complete_cb(p_cbw->lun, p_cbw->command);
-            }
+            tud_msc_scsi_complete_cb(p_cbw->lun, p_cbw->command);
             break;
         }
 
@@ -637,16 +686,14 @@ static int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_
     case SCSI_CMD_START_STOP_UNIT:
       resplen = 0;
 
-      if (tud_msc_start_stop_cb) {
-        scsi_start_stop_unit_t const* start_stop = (scsi_start_stop_unit_t const*)scsi_cmd;
-        if (!tud_msc_start_stop_cb(lun, start_stop->power_condition, start_stop->start, start_stop->load_eject)) {
-          // Failed status response
-          resplen = -1;
+      scsi_start_stop_unit_t const* start_stop = (scsi_start_stop_unit_t const*)scsi_cmd;
+      if (!tud_msc_start_stop_cb(lun, start_stop->power_condition, start_stop->start, start_stop->load_eject)) {
+        // Failed status response
+        resplen = -1;
 
-          // set default sense if not set by callback
-          if (p_msc->sense_key == 0) {
-            set_sense_medium_not_present(lun);
-          }
+        // set default sense if not set by callback
+        if (p_msc->sense_key == 0) {
+          set_sense_medium_not_present(lun);
         }
       }
       break;
@@ -654,16 +701,14 @@ static int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_
     case SCSI_CMD_PREVENT_ALLOW_MEDIUM_REMOVAL:
       resplen = 0;
 
-      if (tud_msc_prevent_allow_medium_removal_cb) {
-        scsi_prevent_allow_medium_removal_t const* prevent_allow = (scsi_prevent_allow_medium_removal_t const*)scsi_cmd;
-        if (!tud_msc_prevent_allow_medium_removal_cb(lun, prevent_allow->prohibit_removal, prevent_allow->control)) {
-          // Failed status response
-          resplen = -1;
+      scsi_prevent_allow_medium_removal_t const* prevent_allow = (scsi_prevent_allow_medium_removal_t const*)scsi_cmd;
+      if (!tud_msc_prevent_allow_medium_removal_cb(lun, prevent_allow->prohibit_removal, prevent_allow->control)) {
+        // Failed status response
+        resplen = -1;
 
-          // set default sense if not set by callback
-          if (p_msc->sense_key == 0) {
-            set_sense_medium_not_present(lun);
-          }
+        // set default sense if not set by callback
+        if (p_msc->sense_key == 0) {
+          set_sense_medium_not_present(lun);
         }
       }
       break;
@@ -731,22 +776,19 @@ static int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_
     break;
 
     case SCSI_CMD_INQUIRY: {
-      scsi_inquiry_resp_t inquiry_rsp = {
-        .is_removable = 1,
-        .version = 2,
-        .response_data_format = 2,
-        .additional_length = sizeof(scsi_inquiry_resp_t) - 5,
-      };
+      scsi_inquiry_resp_t *inquiry_rsp = (scsi_inquiry_resp_t *) buffer;
+      tu_memclr(inquiry_rsp, sizeof(scsi_inquiry_resp_t));
+      inquiry_rsp->is_removable = 1;
+      inquiry_rsp->version = 2;
+      inquiry_rsp->response_data_format = 2;
+      inquiry_rsp->additional_length = sizeof(scsi_inquiry_resp_t) - 5;
 
-      // vendor_id, product_id, product_rev is space padded string
-      memset(inquiry_rsp.vendor_id  , ' ', sizeof(inquiry_rsp.vendor_id));
-      memset(inquiry_rsp.product_id , ' ', sizeof(inquiry_rsp.product_id));
-      memset(inquiry_rsp.product_rev, ' ', sizeof(inquiry_rsp.product_rev));
-
-      tud_msc_inquiry_cb(lun, inquiry_rsp.vendor_id, inquiry_rsp.product_id, inquiry_rsp.product_rev);
-
-      resplen = sizeof(inquiry_rsp);
-      TU_VERIFY(0 == tu_memcpy_s(buffer, bufsize, &inquiry_rsp, (size_t) resplen));
+      resplen = (int32_t) tud_msc_inquiry2_cb(lun, inquiry_rsp, bufsize);
+      if (resplen == 0) {
+        // stub callback with no response, use v1 callback
+        tud_msc_inquiry_cb(lun, inquiry_rsp->vendor_id, inquiry_rsp->product_id, inquiry_rsp->product_rev);
+        resplen = sizeof(scsi_inquiry_resp_t);
+      }
     }
     break;
 
@@ -759,10 +801,7 @@ static int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_
         .block_descriptor_len = 0 // no block descriptor are included
       };
 
-      bool writable = true;
-      if (tud_msc_is_writable_cb) {
-        writable = tud_msc_is_writable_cb(lun);
-      }
+      bool writable = tud_msc_is_writable_cb(lun);
 
       mode_resp.write_protected = !writable;
 
@@ -786,9 +825,7 @@ static int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_
       TU_VERIFY(0 == tu_memcpy_s(buffer, bufsize, &sense_rsp, (size_t) resplen));
 
       // request sense callback could overwrite the sense data
-      if (tud_msc_request_sense_cb) {
-        resplen = tud_msc_request_sense_cb(lun, buffer, (uint16_t)bufsize);
-      }
+      resplen = tud_msc_request_sense_cb(lun, buffer, (uint16_t)bufsize);
 
       // Clear sense data after copy
       tud_msc_set_sense(lun, 0, 0, 0);
@@ -846,11 +883,7 @@ static void proc_read_io_data(mscd_interface_t* p_msc, int32_t nbytes) {
 
 static void proc_write10_cmd(mscd_interface_t* p_msc) {
   msc_cbw_t const* p_cbw = &p_msc->cbw;
-  bool writable = true;
-
-  if (tud_msc_is_writable_cb) {
-    writable = tud_msc_is_writable_cb(p_cbw->lun);
-  }
+  bool writable = tud_msc_is_writable_cb(p_cbw->lun);
 
   if (!writable) {
     // Not writable, complete this SCSI op with error

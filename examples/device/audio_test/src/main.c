@@ -83,9 +83,7 @@ int main(void) {
       .speed = TUSB_SPEED_AUTO};
   tusb_init(BOARD_TUD_RHPORT, &dev_init);
 
-  if (board_init_after_tusb) {
-    board_init_after_tusb();
-  }
+  board_init_after_tusb();
 
   // Init values
   sampFreq = CFG_TUD_AUDIO_FUNC_1_SAMPLE_RATE;
@@ -386,7 +384,7 @@ bool tud_audio_get_req_entity_cb(uint8_t rhport, tusb_control_request_t const *p
   return false;// Yet not implemented
 }
 
-bool tud_audio_set_itf_close_EP_cb(uint8_t rhport, tusb_control_request_t const *p_request) {
+bool tud_audio_set_itf_close_ep_cb(uint8_t rhport, tusb_control_request_t const *p_request) {
   (void) rhport;
   (void) p_request;
   startVal = 0;

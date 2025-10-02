@@ -95,6 +95,7 @@
 #define OPT_MCU_STM32H7RS         317 ///< ST F7RS
 #define OPT_MCU_STM32C0           318 ///< ST C0
 #define OPT_MCU_STM32N6           319 ///< ST N6
+#define OPT_MCU_STM32WBA          320 ///< ST WBA
 
 // Sony
 #define OPT_MCU_CXD56             400 ///< SONY CXD56
@@ -128,6 +129,9 @@
 #define OPT_MCU_ESP32C2           905 ///< Espressif ESP32-C2
 #define OPT_MCU_ESP32H2           906 ///< Espressif ESP32-H2
 #define OPT_MCU_ESP32P4           907 ///< Espressif ESP32-P4
+#define OPT_MCU_ESP32C5           908 ///< Espressif ESP32-C5
+#define OPT_MCU_ESP32C61          909 ///< Espressif ESP32-C61
+#define OPT_MCU_ESP32H4           910 ///< Espressif ESP32-H4
 #define TUSB_MCU_VENDOR_ESPRESSIF (CFG_TUSB_MCU >= 900 && CFG_TUSB_MCU < 1000) // check if Espressif MCU
 #define TUP_MCU_ESPRESSIF        TUSB_MCU_VENDOR_ESPRESSIF //  for backward compatibility
 
@@ -200,6 +204,15 @@
 #define OPT_MCU_MAX32666         2401  ///< ADI MAX32666/5
 #define OPT_MCU_MAX32650         2402  ///< ADI MAX32650/1/2
 #define OPT_MCU_MAX78002         2403  ///< ADI MAX78002
+
+// ArteryTek
+#define OPT_MCU_AT32F403A_407    2500  ///< ArteryTek AT32F403A_AT32F407
+#define OPT_MCU_AT32F415         2501  ///< ArteryTek AT32F415
+#define OPT_MCU_AT32F435_437     2502  ///< ArteryTek AT32F435_AT32F437
+#define OPT_MCU_AT32F423         2503  ///< ArteryTek AT32F423
+#define OPT_MCU_AT32F402_405     2504  ///< ArteryTek AT32F402_405
+#define OPT_MCU_AT32F425         2505  ///< ArteryTek AT32F425
+#define OPT_MCU_AT32F413         2506  ///< ArteryTek AT32F413
 
 // Check if configured MCU is one of listed
 // Apply _TU_CHECK_MCU with || as separator to list of input
