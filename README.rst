@@ -60,6 +60,7 @@ Supports multiple device configurations by dynamically changing USB descriptors,
 -  Human Interface Device (HID): Generic (In & Out), Keyboard, Mouse, Gamepad etc ...
 -  Mass Storage Class (MSC): with multiple LUNs
 -  Musical Instrument Digital Interface (MIDI)
+-  Media Transfer Protocol (MTP/PTP)
 -  Network with RNDIS, Ethernet Control Model (ECM), Network Control Model (NCM)
 -  Test and Measurement Class (USBTMC)
 -  Video class 1.5 (UVC): work in progress
@@ -121,7 +122,7 @@ Supported CPUs
 +--------------+-----------------------------+--------+------+-----------+------------------------+-------------------+
 | Dialog       | DA1469x                     | ✔      | ✖    | ✖         | da146xx                |                   |
 +--------------+-----------------------------+--------+------+-----------+------------------------+-------------------+
-| Espressif    | S2, S3                      | ✔      | ✔    | ✖         | dwc2 or esp32sx        |                   |
+| Espressif    | S2, S3                      | ✔      | ✔    | ✖         | dwc2                   |                   |
 | ESP32        +-----------------------------+--------+------+-----------+------------------------+-------------------+
 |              | P4                          | ✔      | ✔    | ✔         | dwc2                   |                   |
 |              +-----------------------------+--------+------+-----------+------------------------+-------------------+
@@ -239,6 +240,15 @@ Table Legend
 ✖         Not supported by hardware
 \[empty\] Unknown
 ========= =========================
+
+Development Tools
+=================
+
+The following tools are provided freely to support the development of the TinyUSB project:
+
+- `IAR Build Tools (CX) <https://iar.com>`_ Professional IDE and compiler for embedded development.
+- `JetBrains CLion <https://www.jetbrains.com/clion/>`_ Cross-platform IDE for C and C++ development.
+- `PVS-Studio <https://pvs-studio.com/en/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source>`_ static analyzer for C, C++, C#, and Java code.
 
 
 .. |Build Status| image:: https://github.com/hathach/tinyusb/actions/workflows/build.yml/badge.svg

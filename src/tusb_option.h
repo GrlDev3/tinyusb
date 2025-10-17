@@ -31,7 +31,7 @@
 
 // Version is release as major.minor.revision eg 1.0.0
 #define TUSB_VERSION_MAJOR     0
-#define TUSB_VERSION_MINOR     18
+#define TUSB_VERSION_MINOR     19
 #define TUSB_VERSION_REVISION  0
 
 #define TUSB_VERSION_NUMBER    (TUSB_VERSION_MAJOR * 10000 + TUSB_VERSION_MINOR * 100 + TUSB_VERSION_REVISION)
@@ -62,7 +62,8 @@
 #define OPT_MCU_LPC55XX            OPT_MCU_LPC55
 
 // NRF
-#define OPT_MCU_NRF5X             100 ///< Nordic nRF5x series
+#define OPT_MCU_NRF5X             100 ///< Nordic nRF 52,53 series
+#define OPT_MCU_NRF54             101 ///< Nordic nRF54 series
 
 // SAM
 #define OPT_MCU_SAMD21            200 ///< MicroChip SAMD21
@@ -70,8 +71,9 @@
 #define OPT_MCU_SAMG              202 ///< MicroChip SAMDG series
 #define OPT_MCU_SAME5X            203 ///< MicroChip SAM E5x
 #define OPT_MCU_SAMD11            204 ///< MicroChip SAMD11
-#define OPT_MCU_SAML22            205 ///< MicroChip SAML22
-#define OPT_MCU_SAML21            206 ///< MicroChip SAML21
+#define OPT_MCU_SAML2X            205 ///< MicroChip SAML2x
+#define OPT_MCU_SAML21            OPT_MCU_SAML2X ///< SAML21 backward compatibility
+#define OPT_MCU_SAML22            OPT_MCU_SAML2X ///< SAML22 backward compatibility
 #define OPT_MCU_SAMX7X            207 ///< MicroChip SAME70, S70, V70, V71 family
 
 // STM32
@@ -515,6 +517,10 @@
 
 #ifndef CFG_TUD_MSC
   #define CFG_TUD_MSC             0
+#endif
+
+#ifndef CFG_TUD_MTP
+  #define CFG_TUD_MTP             0
 #endif
 
 #ifndef CFG_TUD_HID
