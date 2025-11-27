@@ -75,7 +75,6 @@
   #define TU_MESS_FAILED() do {} while (0)
 #endif
 
-#ifndef TU_BREAKPOINT
 // Halt CPU (breakpoint) when hitting error, only apply for Cortex M3, M4, M7, M33. M55
 #if defined(__ARM_ARCH_7M__) || defined (__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8_1M_MAIN__) || \
     defined(__ARM7M__) || defined (__ARM7EM__) || defined(__ARM8M_MAINLINE__) || defined(__ARM8EM_MAINLINE__)
@@ -92,7 +91,6 @@
 
 #else
   #define TU_BREAKPOINT() do {} while (0)
-#endif
 #endif
 
 /*------------------------------------------------------------------*/
